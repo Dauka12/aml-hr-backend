@@ -1,12 +1,13 @@
 package com.example.models;
 
-import jakarta.persistence.CascadeType;
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "employees")
@@ -22,9 +23,8 @@ public class Employee {
     private String department;
     private Double salary;
 
-    // Связь с User
-    @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL)
-    private User user;
+    @Transient // Поле не сохраняется в базе данных
+    private List<Long> taskIds; // Список ID задач сотрудника
 
     // Конструкторы
     public Employee() {}
@@ -86,11 +86,11 @@ public class Employee {
         this.salary = salary;
     }
 
-    public User getUser() {
-        return user;
+    public List<Long> getTaskIds() {
+        return taskIds;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setTaskIds(List<Long> taskIds) {
+        this.taskIds = taskIds;
     }
 }

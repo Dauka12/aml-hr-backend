@@ -12,16 +12,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.dto.TaskRequest;
 import com.example.models.Task;
+import com.example.repositories.EmployeeRepository;
 import com.example.repositories.TaskRepository;
 
 @RestController
 @RequestMapping("/tasks")
 public class TaskController {
     private final TaskRepository taskRepository;
+    private final EmployeeRepository employeeRepository;
 
-    public TaskController(TaskRepository taskRepository) {
+    public TaskController(TaskRepository taskRepository, EmployeeRepository employeeRepository) {
         this.taskRepository = taskRepository;
+        this.employeeRepository = employeeRepository;
     }
 
     // Получение всех задач
@@ -38,7 +42,14 @@ public class TaskController {
 
     // Создание новой задачи
     @PostMapping
-    public Task createTask(@RequestBody Task task) {
+    public Task createTask(@RequestBody TaskRequest taskRequest) {
+        // Проверяем, существует ли сотрудник с таким ID
+        employeeRepository.findById(taskRequest.getEmployeeId())
+                .orElseThrow(() -> new RuntimeException("Сотрудник не найден!"));
+
+        // Создаём новую задачу и привязываем её к сотруднику через employeeId
+        Task task = new Task(taskRequest.getTitle(), taskRequest.getDescription(), taskRequest.getStatus(), taskRequest.getEmployeeId());
+
         return taskRepository.save(task);
     }
 

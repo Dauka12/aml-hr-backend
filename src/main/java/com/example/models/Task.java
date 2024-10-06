@@ -1,11 +1,10 @@
 package com.example.models;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -13,23 +12,22 @@ import jakarta.persistence.Table;
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private Long id;
+    
     private String title;
     private String description;
     private String status;
 
-    @ManyToOne
-    @JoinColumn(name = "employee_id", nullable = false)
-    private Employee employee;
+    @Column(name = "employee_id", nullable = false)
+    private Long employeeId;
 
     public Task() {}
 
-    public Task(String title, String description, String status, Employee employee) {
+    public Task(String title, String description, String status, Long employeeId) {
         this.title = title;
         this.description = description;
         this.status = status;
-        this.employee = employee;
+        this.employeeId = employeeId;
     }
 
     public Long getId() {
@@ -60,11 +58,11 @@ public class Task {
         this.status = status;
     }
 
-    public Employee getEmployee() {
-        return employee;
+    public Long getEmployeeId() {
+        return employeeId;
     }
 
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
+    public void setEmployee(Long employeeId) {
+        this.employeeId = employeeId;
     }
 }
