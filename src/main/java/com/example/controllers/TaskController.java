@@ -3,6 +3,10 @@ package com.example.controllers;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.service.TaskService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,56 +23,35 @@ import com.example.repositories.TaskRepository;
 
 @RestController
 @RequestMapping("/tasks")
+@RequiredArgsConstructor
 public class TaskController {
-    private final TaskRepository taskRepository;
-    private final EmployeeRepository employeeRepository;
 
-    public TaskController(TaskRepository taskRepository, EmployeeRepository employeeRepository) {
-        this.taskRepository = taskRepository;
-        this.employeeRepository = employeeRepository;
-    }
+    private final TaskService taskService;
 
-    // Получение всех задач
     @GetMapping
     public List<Task> getAllTasks() {
-        return taskRepository.findAll();
+        return taskService.findAllTasks();
     }
 
-    // Получение задачи по ID
     @GetMapping("/{id}")
     public Optional<Task> getTaskById(@PathVariable Long id) {
-        return taskRepository.findById(id);
+        return Optional.ofNullable(taskService.findTaskById(id));
     }
 
-    // Создание новой задачи
-    @PostMapping
-    public Task createTask(@RequestBody TaskRequest taskRequest) {
-        // Проверяем, существует ли сотрудник с таким ID
-        employeeRepository.findById(taskRequest.getEmployeeId())
-                .orElseThrow(() -> new RuntimeException("Сотрудник не найден!"));
-
-        // Создаём новую задачу и привязываем её к сотруднику через employeeId
-        Task task = new Task(taskRequest.getTitle(), taskRequest.getDescription(), taskRequest.getStatus(), taskRequest.getEmployeeId());
-
-        return taskRepository.save(task);
+    @PostMapping()
+    public ResponseEntity<?> createTask(@RequestBody TaskRequest taskRequest) {
+        return ResponseEntity.ok(taskService.createTask(taskRequest));
     }
 
-    // Обновление задачи
+
     @PutMapping("/{id}")
-    public Task updateTask(@PathVariable Long id, @RequestBody Task taskDetails) {
-        Task task = taskRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Задача не найдена"));
-
-        task.setTitle(taskDetails.getTitle());
-        task.setDescription(taskDetails.getDescription());
-        task.setStatus(taskDetails.getStatus());
-
-        return taskRepository.save(task);
+    public ResponseEntity<?> updateTask(@PathVariable Long id, @RequestBody TaskRequest taskRequest, @RequestBody Task taskDetails) {
+        return ResponseEntity.ok(taskService.updateTaskById(id, taskRequest, taskDetails));
     }
 
     // Удаление задачи
     @DeleteMapping("/{id}")
     public void deleteTask(@PathVariable Long id) {
-        taskRepository.deleteById(id);
+        taskService.deleteTaskById(id);
     }
 }
