@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+//TODO сделать таски в базе более подходящим позже
 @Entity
 @Table(name = "tasks")
 public class Task {
